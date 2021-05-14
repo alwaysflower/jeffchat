@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="static/js/common/jquery-1.9.1.min.js"></script>
+</head>
+<body>
+<br>
+    <div>
+        <label>用户账号</label><input id="userId" value="">
+    </div>
+    <div>
+        <label>密码</label><input id="password" value="">
+    </div>
+    <div>
+        <button onclick="login()">登录</button>
+    </div>
+
+    <div>
+        <div>
+            <label>用户id</label><input id="toId" value="">
+        </div>
+        <div>
+            <label>发送内容</label><input id="content" value="">
+            <button onclick="send()">发送</button>
+        </div>
+        <div>
+            <label>聊天窗口</label>
+            <textarea rows="3" cols="40" id="chatWindow">
+        </textarea>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    var ws;
+    function login() {
+        ws = new WebSocket("ws://192.168.1.220:8081/ws");
+        ws.onopen = function()
+        {
+            console.log("已连接");
+            var message = {
+                userId: $("#userId").val(),
+                password: $("#password").val(),
+                type: "0"
+            };
+            ws.send(JSON.stringify(message));
+        };
+
+        ws.onmessage = function (evt)
+        {
+            console.log("收到消息");
+            var received_msg = JSON.parse(evt.data);
+            $("#chatWindow").append(received_msg.detail);
+            $("#chatWindow").append("\n");
+        };
+
+<!--        ws.onclose = function()-->
+<!--        { -->
+<!--            alert("连接断开");-->
+<!--        };-->
+    };
+
+    function send () {
+        console.log("已发送");
+        var message = {
+            toId: $("#toId").val(),
+            content: $("#content").val(),
+            type: "1"
+        };
+        ws.send(JSON.stringify(message));
+    }
+</script>
+</html>
